@@ -1,0 +1,22 @@
+[20488:1836:0529/125641.426:WARNING:chrome_main_delegate.cc(742)] This is Chrome version 125.0.6422.78 (not a warning)
+[20488:1836:0529/125641.533:INFO:chrome_browser_cloud_management_controller.cc(168)] Starting CBCM Controller Initialization
+[20488:1836:0529/125641.533:INFO:chrome_browser_cloud_management_controller.cc(196)] No machine level policy manager exists.
+[20488:1836:0529/125641.552:WARNING:browser_management_service.cc(128)] EnterpriseLogoUrl fetch failed with error code -1 and MIME type 
+[13196:24580:0529/125641.655:INFO:cpu_info.cc(53)] Available number of cores: 16
+[23180:19544:0529/125641.659:INFO:cpu_info.cc(53)] Available number of cores: 16
+[25184:3248:0529/125641.745:INFO:cpu_info.cc(53)] Available number of cores: 16
+[23708:1364:0529/125641.789:INFO:cpu_info.cc(53)] Available number of cores: 16
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent", source:  (0)
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent1", source:  (0)
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent2", source:  (0)
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent3", source:  (0)
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent4", source:  (0)
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent5", source:  (0)
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent6", source:  (0)
+[20488:1836:0529/125641.792:INFO:CONSOLE(0)] "Unchecked runtime.lastError: Cannot create item with duplicate id parent7", source:  (0)
+[20488:1836:0529/125641.834:INFO:CONSOLE(0)] "Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.", source: chrome-extension://ndgimibanhlabgdgjcpbbndiehljcpfh/extension/background.js (0)
+[6140:14140:0529/125641.902:INFO:cpu_info.cc(53)] Available number of cores: 16
+[6436:9400:0529/125641.963:INFO:cpu_info.cc(53)] Available number of cores: 16
+[20488:1836:0529/125643.754:ERROR:device_event_log_impl.cc(195)] [12:56:43.754] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Element not found. (0x490)
+[9684:24124:0529/125646.005:INFO:cpu_info.cc(53)] Available number of cores: 16
+[20488:1836:0529/125646.053:WARNING:pref_notifier_impl.cc(41)] Pref observer for media_router.cast_allow_all_ips found at shutdown.

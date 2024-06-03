@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+<title>SEO BOT - Orders</title>
+{% endblock title %}
+
+{% block content %}
+  {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'error' %}
+            <div class="alert alert-danger d-flex align-items-center" role="alert" id="alertMessage">
+                <i class='bx bxs-bell-ring text-danger me-1'></i> {{ message|safe }}
+            </div>
+        {% elif message.tags == 'success' %}
+            <div class="alert alert-success d-flex align-items-center" role="alert" id="alertMessage">
+                <i class='bx bxs-check-circle text-success me-1'></i> {{ message|safe }}
+            </div>
+        {% endif %}
+      {% endfor %}
+          <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+          <script>
+              $(document).ready(function () {
+                  setTimeout(function () {
+                      $("#alertMessage").fadeOut("slow", function () {
+                          $(this).remove();
+                      });
+                  }, 4000);
+              });
+          </script>
+    {% endif %}
+
+<div class="col-12 border shadow-sm p-4 mb-4 rounded h-100 overflow-auto">
+  <div class="row mb-3">
+    <div class="col-12 col-md-6 col-lg-3">
+      <a href="{% url 'orders:list_of_orders' %}" class="btn nav-buttons w-75 d-flex align-items-center justify-content-center">
+          <i class='bx bxs-circle me-2' ></i>
+        Orders
+      </a>
+      
+    </div> 
+    <div class="col-12 col-md-6 col-lg-3">
+      <a href="{% url 'orders:profile' %}" class="btn nav-buttons w-75 d-flex align-items-center justify-content-center">
+        <i class='bx bxs-circle me-2' ></i>
+        Profiles
+    </a>
+  </div>
+  </div>
+  <form id="hiddenForm" style="display: none;" method="post" action="/update-action/">
+    {% csrf_token %}
+    <input type="hidden" name="order_id" value="" id="hiddenOrderId">
+    <input type="hidden" name="action" value="" id="hiddenAction">
+    <input type="hidden" name="keyword_id" value="" id="hiddenkeyword_id">
+    <input type="hidden" name="second_action" value="" id="hiddenSecondAction">
+</form>
+ 
+
+  <table class="table align-middle mb-0 bg-white">
+      <thead class="bg-light">
+        <tr>
+          <th>ID</th>
+          <th>Order</th>
+          <th>Activity Number</th>
+          <th>Action</th>
+          <th ><p style="display: none;" id="thead1">Second Action</p></th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody class="shadow">
+        {% for order in keyword_list %}
+        <tr>
+              
+              <input type="hidden" name="order_id{{order.id}}" value="1">
+              <td>{{order.id}}</td>
+              <td>{{order.keyword.domain_name}}</td>
+              <td>{{order.keyword.num_users}}</td>
+              <td>
+                  <select name="action{{order.id}}" id="action{{order.id}}" onchange="showSecondAction(this.value, '{{order.id}}');">
+                      <option value="">Select Action</option>
+                      {% if order.has_sponsored %}
+                      <option value="Sponsored">Click on Sponsored</option>
+                      {% endif %}
+                      {% if order.has_business %}
+                      <option value="Business">Click on Business</option>
+                      {% endif %}
+                      {% if order.has_sponsored_business %}
+                      <option value="Sponsored Business">Click on Sponsored Business</option>
+                      {% endif %}
+                  </select>
+              </td>
+              <td>
+                  <select name="second_action{{order.id}}" id="secondAction{{order.id}}" style="display:none;">
+                      <option value="" selected>Select Action</option>
+                      <option value="website">Website</option>
+                      <option value="direction">Direction</option>
+                      <option value="call">Call</option>
+                  </select>
+              </td>
+              <td>Waiting</td>
+              <td class="d-flex">
+                <button type="button" onclick="populateAndSubmitForm('{{order.keyword.id}}','{{order.id}}')" class="btn btn-link border border-success rounded-pill bg-success btn-sm btn-rounded text-decoration-none text-white">
+                  <i class="bx bxs-cloud-upload"></i> Update Order
+              </button>
+              </td>
+      </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+    <!-- Pagination -->
+    {% if keyword_list.has_other_pages %}
+      <div class="mt-3 d-flex justify-content-end">
+        <ul class="pagination">
+          {% if order_list.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ order_list.previous_page_number }}">&laquo;</a>
+            </li>
+          {% endif %}
+      
+          {% for num in order_list.paginator.page_range %}
+            <li class="page-item{% if num == order_list.number %} active{% endif %}">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endfor %}
+      
+          {% if order_list.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ order_list.next_page_number }}">&raquo;</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+</div>
+<script>
+  function populateAndSubmitForm(keywordId,order_id) {
+      var action = document.getElementById("action"+order_id).value
+      var second_action = document.getElementById("secondAction"+order_id).value
+      document.getElementById('hiddenkeyword_id').value = keywordId;
+      document.getElementById('hiddenOrderId').value = order_id;
+      document.getElementById('hiddenAction').value = action;
+      document.getElementById('hiddenSecondAction').value = second_action;
+      document.getElementById('hiddenForm').submit();
+  }
+  </script>
+
+<script>
+  function showSecondAction(action, index) {
+      const secondActionEl = document.getElementById('secondAction' + index);
+      const secondThead = document.getElementById("thead1");
+      if (action === 'Business' || action === 'Sponsored Business') {
+          secondActionEl.style.display = 'block';
+          secondThead.style.display = 'block';
+      } else {
+          secondActionEl.style.display = 'none';
+          secondThead.style.display = 'none';
+      }
+  }
+  </script>
+{% endblock content %}

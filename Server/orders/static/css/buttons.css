@@ -1,0 +1,57 @@
+/* Default styles for the nav buttons */
+.nav-buttons {
+    border: 1px solid #1A2980;
+    background-color: #FFF7F1;
+}
+
+/* Hover state for nav buttons */
+.nav-buttons:hover {
+    background-color: #1A2980;
+    border: 1px solid #1A2980;
+    color: #ffffff;
+}
+
+/* Active state for nav buttons */
+.nav-buttons.active {
+    background-color: #1A2980;
+    border: 1px solid #1A2980;
+    color: #ffffff;
+}
+
+.nav-buttons.active i {
+    color: #ffffff;
+}
+
+/* Color styles for the icon within nav buttons */
+.nav-buttons i {
+    color: #1A2980;
+}
+
+/* Icon color on hover */
+.nav-buttons:hover i {
+    color: #ffffff;
+}
+
+/* Text color on hover for the anchor within nav buttons */
+.nav-buttons:hover a {
+    color: #ffffff;
+}
+
+/* Pagination Style Buttons With CSS */
+.page-link {
+    background-color: #ffffff;
+    border-color: #1A2980;
+    color: #212529;
+  }
+
+  .page-link:hover {
+    background-color: #1A2980;
+    border-color: #1A2980;
+    color: #ffffff;
+  }
+
+  .page-item.active .page-link {
+    background-color: #1A2980;
+    border-color: #1A2980;
+    color: #ffffff;
+  }

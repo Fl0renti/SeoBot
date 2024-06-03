@@ -1,0 +1,20 @@
+<form method="GET" action="{% url 'orders:list_of_orders' %}" class="w-100">
+    <div class="input-group my-1 d-flex justify-content-center">
+        <div class="col-12 col-md-4 col-lg-2 mb-2 mb-md-0">
+            <select name="column" class="form-select form-control">
+                <option value="all" selected>All</option>
+                <option value="domain_name">Domain Name</option>
+                <option value="proxy">Proxy</option>
+                <option value="active">Active</option>
+                <option value="work_sec">Seconds(Work)</option>
+                <option value="avg_sec">Seconds(Avg)</option>
+                <option value="num_users">Number Of Users</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-8 col-lg-9 ms-2">
+            <div class="input-group">
+                <input name="query" class="form-control" type="search" placeholder="Search" aria-label="Search">
+            </div>
+        </div>
+    </div>
+</form>

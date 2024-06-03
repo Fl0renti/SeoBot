@@ -1,0 +1,62 @@
+[
+    {
+        "id": 228,
+        "domain_name": "https://find drywall",
+        "work_sec": 30,
+        "max_workers": 6,
+        "order_schedule": null,
+        "action": "Business",
+        "has_sponsored": false,
+        "has_business": true,
+        "has_sponsored_business": false,
+        "status": "In Progress"
+    },
+    {
+        "id": 231,
+        "domain_name": "https://sea food restaurant",
+        "work_sec": 30,
+        "max_workers": 5,
+        "order_schedule": "2024-05-21T10:47:00Z",
+        "action": "Business",
+        "has_sponsored": false,
+        "has_business": true,
+        "has_sponsored_business": false,
+        "status": "In Progress"
+    },
+    {
+        "id": 232,
+        "domain_name": "https://burger",
+        "work_sec": 30,
+        "max_workers": 6,
+        "order_schedule": "2024-05-21T09:51:00Z",
+        "action": "Business",
+        "has_sponsored": false,
+        "has_business": true,
+        "has_sponsored_business": false,
+        "status": "In Progress"
+    },
+    {
+        "id": 234,
+        "domain_name": "https://chess near me",
+        "work_sec": 30,
+        "max_workers": 5,
+        "order_schedule": "2024-05-21T10:51:00Z",
+        "action": "Business",
+        "has_sponsored": false,
+        "has_business": true,
+        "has_sponsored_business": false,
+        "status": "In Progress"
+    },
+    {
+        "id": 235,
+        "domain_name": "https://dyson",
+        "work_sec": 30,
+        "max_workers": 5,
+        "order_schedule": null,
+        "action": "Sponsored",
+        "has_sponsored": true,
+        "has_business": false,
+        "has_sponsored_business": false,
+        "status": "In Progress"
+    }
+]

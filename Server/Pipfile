@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+asgiref = "==3.7.2"
+django = "==4.2.11"
+sqlparse = "==0.4.4"
+requests = "*"
+beautifulsoup4 = "*"
+lxml = "*"
+selenium = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"

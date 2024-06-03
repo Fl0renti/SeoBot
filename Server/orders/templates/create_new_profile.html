@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <title>Create New Profile</title>
+{% endblock title %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            {% block nav_links %}
+                <span class="d-flex align-items-center mb-2">
+                    <a href="{% url 'orders:list_of_orders' %}" class="text-decoration-none text-secondary ">
+                        <i class='bx bx-home fs-5 text-secondary' ></i>
+                    </a>
+
+                    <i class='bx bx-chevron-right fs-5 text-secondary' ></i>
+                    <span class="text-secondary">Add New Profile</span>
+                </span>
+            {% endblock nav_links %}
+            <div class="card shadow-sm p-4 mb-5 bg-white rounded">
+                <h2 class="text-primary mt-1">New Profile</h2>
+                <hr>
+                <div class="card-body">
+                    <form action="" method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <div class="alert alert-info alert-dismissible d-flex align-items-center fade show">
+                                <i class="bi-info-circle-fill"></i>
+                              <strong class="mx-2">Info!</strong> Proxy Format: IP:PORT:USERNAME:PASSWORD.
+                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          </div>
+                            <label for="{{ form.order_name.id_for_label }}" class="form-label">{{ form.proxy.label }}:</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class='bx bx-code-curly fs-5' style='color:#4d524d'></i>
+                                </span>
+                                {{ form.proxy }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.proxy.id_for_label }}" class="form-label">{{ form.UserAgent.label }}:</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class='bx bxs-server fs-5' style='color:#4d524d'></i>
+                                </span>
+                                {{ form.UserAgent }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.domain_type.id_for_label }}" class="form-label">{{ form.domain_type.label }}:</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class='bx bx-windows fs-5' style='color:#4d524d'></i>
+                                </span>
+                                {{ form.domain_type }}
+                            </div>
+                        </div>
+                        
+
+
+                       
+
+                        <div class="float-end">
+                            <input type="submit" class="btn btn-primary" value="Create Profile">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

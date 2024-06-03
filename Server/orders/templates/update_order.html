@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>Update Order</title>
+{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        {% block nav_links %}
+            <span class="d-flex align-items-center mb-2">
+                <a href="{% url 'orders:list_of_orders' %}" class="text-decoration-none text-secondary ">
+                    <i class='bx bx-home fs-5 text-secondary' ></i>
+                </a>
+                <i class='bx bx-chevron-right fs-5 text-secondary' ></i>
+                <span class="text-secondary">Update Order</span>
+            </span>
+        {% endblock nav_links %}
+        <div class="card shadow-sm p-4 mb-5 bg-white rounded">
+            <h2 class="text-success mt-1">Update Order</h2>
+            <hr>
+            <div class="card-body">
+                    <form action="" method="post">
+                        {% csrf_token %}
+
+                        <label class="mb-1">{{ form.domain_name.label }}:</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">
+                                <i class='bx bx-code-curly fs-5' style='color:#4d524d'></i>
+                            </span>
+                            {{ form.domain_name }}
+                        </div>
+                        
+                       
+
+                        <div class="mb-3">
+                            <label for="{{ form.domain_type.id_for_label }}" class="form-label">{{ form.domain_type.label }}:</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class='bx bx-windows fs-5' style='color:#4d524d'></i>
+                                </span>
+                                {{ form.domain_type }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.active.id_for_label }}" class="form-label">{{ form.active.label }}:</label>
+                                {{ form.active }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="mb-1">{{ form.work_sec.label }}:</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        <i class='bx bxs-server fs-5' style='color:#4d524d'></i>
+                                    </span>
+                                    {{ form.work_sec }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="mb-1">{{ form.avg_sec.label }}:</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        <i class='bx bxs-server fs-5' style='color:#4d524d'></i>
+                                    </span>
+                                    {{ form.avg_sec }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="mb-1">{{ form.num_users.label }}:</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        <i class='bx bxs-server fs-5' style='color:#4d524d'></i>
+                                    </span>
+                                    {{ form.num_users }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.order_schedule.id_for_label }}" class="form-label">{{ form.order_schedule.label }}:</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <i class='bx bxs-time fs-5' style='color:#4d524d'></i>
+                                    </span>
+                                    {{ form.order_schedule }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="float-end">
+                            <input type="submit" class="btn btn-success" value="Update Order">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

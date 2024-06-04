@@ -1,7 +1,14 @@
-2024/06/03-17:16:34.440 5b80 Reusing MANIFEST D:\upbizz projects\FINAL TEST\Bot\Resources\Profiles\profile3\Default\IndexedDB\https_www.dyson.com_0.indexeddb.leveldb/MANIFEST-000001
-2024/06/03-17:16:34.440 5b80 Recovering log #4
-2024/06/03-17:16:34.440 5b80 Reusing old log D:\upbizz projects\FINAL TEST\Bot\Resources\Profiles\profile3\Default\IndexedDB\https_www.dyson.com_0.indexeddb.leveldb/000004.log 
-2024/06/03-17:16:45.553 5b80 Level-0 table #8: started
-2024/06/03-17:16:45.555 5b80 Level-0 table #8: 2323 bytes OK
-2024/06/03-17:16:45.556 5b80 Delete type=0 #4
-2024/06/03-17:16:45.556 5b80 Manual compaction at level-0 from '\x00\x03\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x04\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/06/04-13:34:44.822 4958 Reusing MANIFEST D:\upbizz projects\SeoBot\Bot\Resources\Profiles\profile3\Default\IndexedDB\https_www.dyson.com_0.indexeddb.leveldb/MANIFEST-000001
+2024/06/04-13:34:44.822 4958 Recovering log #10
+2024/06/04-13:34:44.822 4958 Reusing old log D:\upbizz projects\SeoBot\Bot\Resources\Profiles\profile3\Default\IndexedDB\https_www.dyson.com_0.indexeddb.leveldb/000010.log 
+2024/06/04-13:34:44.822 4958 Delete type=2 #8
+2024/06/04-13:34:48.534 3174 Level-0 table #15: started
+2024/06/04-13:34:48.535 3174 Level-0 table #15: 3093 bytes OK
+2024/06/04-13:34:48.537 3174 Delete type=0 #10
+2024/06/04-13:34:48.537 4958 Manual compaction at level-0 from '\x00\x05\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x06\x00\x00\x00' @ 0 : 0; will stop at '\x00\x05\x01\x03\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 471 : 1
+2024/06/04-13:34:48.537 4958 Compacting 1@0 + 1@1 files
+2024/06/04-13:34:48.538 4958 Generated table #16@0: 80 keys, 1451 bytes
+2024/06/04-13:34:48.538 4958 Compacted 1@0 + 1@1 files => 1451 bytes
+2024/06/04-13:34:48.539 4958 compacted to: files[ 0 1 1 0 0 0 0 ]
+2024/06/04-13:34:48.539 4958 Delete type=2 #15
+2024/06/04-13:34:48.540 4958 Manual compaction at level-0 from '\x00\x05\x01\x03\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 471 : 1 .. '\x00\x06\x00\x00\x00' @ 0 : 0; will stop at (end)

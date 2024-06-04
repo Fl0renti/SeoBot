@@ -4,6 +4,17 @@ from lxml import etree
 from .models import Keyword, Order, Profile
 import random
 from SEOBot.settings import PROXY
+import re
+
+def is_valid_domain(domain):
+    # Regular expression pattern for domain name validation
+    domain_pattern = r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
+    
+    # Check if the domain matches the pattern
+    if re.match(domain_pattern, domain):
+        return True
+    else:
+        return False
 
 
 def get_results(results, business_type, attr_type, find_or_find_all='find_all', domain_type='web'):

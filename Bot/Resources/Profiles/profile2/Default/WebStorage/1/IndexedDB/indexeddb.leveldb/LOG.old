@@ -1,0 +1,4 @@
+2024/06/04-14:17:45.851 42c0 Reusing MANIFEST D:\upbizz projects\SeoBot\Bot\Resources\Profiles\profile2\Default\WebStorage\1\IndexedDB\indexeddb.leveldb/MANIFEST-000001
+2024/06/04-14:17:45.852 42c0 Recovering log #3
+2024/06/04-14:17:45.852 42c0 Reusing old log D:\upbizz projects\SeoBot\Bot\Resources\Profiles\profile2\Default\WebStorage\1\IndexedDB\indexeddb.leveldb/000003.log 
+2024/06/04-14:17:45.871 62dc Manual compaction at level-0 from '\x00\x02\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x03\x00\x00\x00' @ 0 : 0; will stop at (end)

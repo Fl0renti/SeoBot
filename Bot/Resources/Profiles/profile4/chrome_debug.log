@@ -1,0 +1,16 @@
+[20808:12308:0604/145039.348:WARNING:chrome_main_delegate.cc(742)] This is Chrome version 125.0.6422.141 (not a warning)
+[20808:12308:0604/145039.475:INFO:chrome_browser_cloud_management_controller.cc(168)] Starting CBCM Controller Initialization
+[20808:12308:0604/145039.475:INFO:chrome_browser_cloud_management_controller.cc(196)] No machine level policy manager exists.
+[20808:12308:0604/145039.497:WARNING:browser_management_service.cc(128)] EnterpriseLogoUrl fetch failed with error code -1 and MIME type 
+[3316:13788:0604/145039.611:INFO:cpu_info.cc(53)] Available number of cores: 16
+[5716:13808:0604/145039.616:INFO:cpu_info.cc(53)] Available number of cores: 16
+[20808:12308:0604/145039.840:ERROR:CONSOLE(59)] "Uncaught Error: Assertion failed: pointerdown doesn't work on iOS", source: chrome://new-tab-page/shared.rollup.js (59)
+[6168:9548:0604/145039.873:INFO:cpu_info.cc(53)] Available number of cores: 16
+[22696:16412:0604/145039.952:INFO:cpu_info.cc(53)] Available number of cores: 16
+[24968:21344:0604/145040.341:INFO:cpu_info.cc(53)] Available number of cores: 16
+[20808:12308:0604/145042.379:ERROR:device_event_log_impl.cc(195)] [14:50:42.378] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Element not found. (0x490)
+[20808:12308:0604/145042.384:ERROR:usb_descriptors.cc(114)] Failed to parse configuration descriptor.
+[20808:12308:0604/145042.385:ERROR:usb_descriptors.cc(114)] Failed to parse configuration descriptor.
+[21328:21740:0604/145042.731:INFO:cpu_info.cc(53)] Available number of cores: 16
+[13036:5336:0604/145044.605:WARNING:spdy_session.cc(2979)] Received HEADERS for invalid stream 25
+[13036:5336:0604/145044.608:WARNING:spdy_session.cc(2979)] Received HEADERS for invalid stream 23

@@ -57,10 +57,6 @@ class Bot:
         self.profile = {}
         self.order = {}
 
-        self.__sponsored_results_xpath = "//span[text()='Sponsored']//ancestor::div[contains(@class, 'xpd')]"
-        self.__business_results_xpath = ""
-        self.__sponsored_business_results_xpath = ""
-
         self.result_to_click = None
         self.sponsored_results = []
         self.business_results = {'parent': [], 'results': []}
@@ -68,6 +64,8 @@ class Bot:
         self.sponsored_business_results = {'parent': [], 'results': []}
 
         self.location_or_business = 'Location'
+
+
 
         self.xpaths = {
             'Sponsored' : "//span[text()='Sponsored']//ancestor::div[contains(@class, 'xpd')]",
@@ -203,14 +201,16 @@ class Bot:
 
 
 
-    def make_random_movements(self, driver, start_time, work_time):
+    def make_random_movements(self):
         """
         Makes random movements of mouse to look like human
         """
+        start_time = time.time()
+        work_time = self.order['work_sec']
         if time.time() - start_time > work_time:
             print("Reached the specified work time. Stopping.")
         else:
-            window_rect = driver.get_window_rect()
+            window_rect = self.driver.get_window_rect()
             width, height = window_rect['width'], window_rect['height']
             start_x = window_rect['x'] + width // 2
             start_y = window_rect['y'] + height // 2
@@ -236,7 +236,7 @@ class Bot:
                     mouse_x, mouse_y = pyautogui.position()
 
                     # Find clickable elements (like <a> tags with href attributes)
-                    clickable_elements = driver.find_elements(By.CSS_SELECTOR, "a[href]")
+                    clickable_elements = self.driver.find_elements(By.CSS_SELECTOR, "a[href]")
 
                     for element in clickable_elements:
                         # Get the element's location and size
@@ -262,7 +262,7 @@ class Bot:
                 move_y = start_y + random.randint(-150, 150)
                 pyautogui.moveTo(move_x, move_y, duration=0.2)
                 # Check if the end of the page is reached
-                if driver.execute_script("return window.innerHeight + window.scrollY >= document.body.offsetHeight"):
+                if self.driver.execute_script("return window.innerHeight + window.scrollY >= document.body.offsetHeight"):
                     break
             clicked = False
             # Scroll back up to the top of the page
@@ -281,7 +281,7 @@ class Bot:
                     mouse_x, mouse_y = pyautogui.position()
 
                     # Find clickable elements (like <a> tags with href attributes)
-                    clickable_elements = driver.find_elements(By.CSS_SELECTOR, "a[href]")
+                    clickable_elements = self.driver.find_elements(By.CSS_SELECTOR, "a[href]")
 
                     for element in clickable_elements:
                         # Get the element's location and size
@@ -306,7 +306,7 @@ class Bot:
                 move_y = start_y + random.randint(-150, 150)
                 pyautogui.moveTo(move_x, move_y, duration=0.2)
                 # Check if the top of the page is reached
-                if driver.execute_script("return window.scrollY == 0"):
+                if self.driver.execute_script("return window.scrollY == 0"):
                     break
 
             print("Completed human-like scrolling.")
@@ -495,10 +495,9 @@ class Bot:
         time.sleep(1)
         url = f"http://{self.django_url}/api/get/orders/web"
         response = requests.get(url)
-
         if response.status_code == 200:
             orders_data = response.json()[0]
-
+            
             if not orders_data:
                 print("There is no order")
       
@@ -671,10 +670,17 @@ class Bot:
             if self.profile in used_profiles:
                 used_profiles.remove(self.profile)
             url = "http://" + self.django_url + f'/api/set/profile/free/{pk}/'
-            response = requests.post(url)
-            print("Updated profile inUsed: ", response.json())
+            try:
+                response = requests.post(url)
+                print("Updated profile inUsed: ", response.json())
+            except Exception as e:
+                print("\nServer is down. \nError: ", e)
 
     
+    def is_click_domain_only(self):
+        return self.order['click_domain_only']
+
+
     def search_google(self):
         self.start_web_driver()
         print("\n\n Started web driver\n")
@@ -683,14 +689,19 @@ class Bot:
 
         self.type_in_input(self.domain) #Types in input the word, in this case the domain
         self.solve_captcha() #Solves captcha if it was found
-        # self.__location_improver_popped_up()
-        self.collect_results_by_action(self.order['action'], pick_random_result=True)
-        self.__do_second_action()
-        start_time = time.time()
-        work_time = self.order['work_sec']
-        self.make_random_movements(self.driver, start_time, work_time)
-        time.sleep(5)
-        print("Finished order!")
+
+        if self.is_click_domain_only():
+            self.make_random_movements()
+            time.sleep(2)
+            self.driver.get(self.order['domain_name'])
+            self.make_random_movements()
+        else:
+            # self.__location_improver_popped_up()
+            self.collect_results_by_action(self.order['action'], pick_random_result=True)
+            self.__do_second_action()
+            self.make_random_movements()
+            time.sleep(5)
+            print("Finished order!")
 
     def full_action(self):
         while True:
@@ -767,11 +778,8 @@ class MobileBot(Bot):
         options.add_argument(f'--user-agent={user_agent}')
         driver = webdriver.Chrome(options=options)
         driver.get('https://www.dyson.com/en')
-        start_time = time.time()
         self.fetch_orders_from_web()
-        work_time = self.order['work_sec']
-        print("WORK TIME: ", work_time)
-        self.make_random_movements(driver, start_time, work_time)
+        self.make_random_movements()
         time.sleep(100)
         driver.quit()
 

@@ -68,6 +68,7 @@ def get_orders(request, domain_type):
             'total_users': keyword.keyword.num_users,
             "order_schedule": keyword.keyword.order_schedule,
             'action': keyword.keyword.action,
+            'click_domain_only': keyword.keyword.click_domain_only,
             'second_action': keyword.keyword.second_action,
             'has_sponsored': keyword.has_sponsored,
             'has_business':keyword.has_business,
@@ -92,6 +93,7 @@ def update_reached_users(request, pk):
     order = Order.objects.get(pk=pk)
     order.increment_reached_users() 
     return JsonResponse({'success': True})
+
 def update_reached_users_incomplete(request, pk):
     """ Function to increase the reached_user number in models.py """
     order = Order.objects.get(pk=pk)
@@ -177,6 +179,8 @@ class CreateNewOrder(CreateView):
     form_class = CreateNewOrder
 
     def form_valid(self, form):
+        if form.cleaned_data.get('click_domain_only'):
+            form.instance.active = True
         domain_name = form.cleaned_data['domain_name']
         messages.success(self.request, f"Domain for&nbsp;<strong>{domain_name}</strong>&nbsp;added successfully!")
         return super().form_valid(form)
@@ -444,13 +448,11 @@ def get_random_proxy(request, domain_type, no):
     random_profile.inUsed = True
     random_profile.serverID = ServerTable.objects.get(id=no)
     random_profile.save()
-    print(random_profile)
 
     # Return the data as JSON
     return JsonResponse(data)
 
 def get_random_proxy_details_web(request, no):
-    print('NUMBER', no)
     data = get_random_proxy(request, 'web', no)
     return data
 
@@ -474,7 +476,6 @@ def setProfileFree(request, pk):
 def get_number_of_profile_mobile(request):
     # Filter Profiles with domain_type 'web' and inUsed False
     profiles = Profile.objects.filter(domain_type='mobile', inUsed=False).count()
-    print(profiles)
     return JsonResponse({"no":profiles})
 
 

@@ -1,6 +1,0 @@
-2024/06/04-12:00:21.076 5a8 Creating DB D:\upbizz projects\SeoBot\Bot\Resources\Profiles\profile4\Default\WebStorage\1\IndexedDB\indexeddb.leveldb since it was missing.
-2024/06/04-12:00:21.079 5a8 Reusing MANIFEST D:\upbizz projects\SeoBot\Bot\Resources\Profiles\profile4\Default\WebStorage\1\IndexedDB\indexeddb.leveldb/MANIFEST-000001
-2024/06/04-12:00:26.354 1370 Level-0 table #5: started
-2024/06/04-12:00:26.356 1370 Level-0 table #5: 6841 bytes OK
-2024/06/04-12:00:26.358 1370 Delete type=0 #3
-2024/06/04-12:00:26.358 409c Manual compaction at level-0 from '\x00\x02\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x03\x00\x00\x00' @ 0 : 0; will stop at (end)

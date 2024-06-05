@@ -196,7 +196,7 @@ class Bot:
             self.set_profile_free(self.profile['id'])
         if self.profile_in_use:
             self.set_profile_free(self.profile['id'])
-        print("Proceeding to next order...")
+        print("Trying to get new order...")
         time.sleep(3)
 
 
@@ -828,16 +828,5 @@ class MobileBot(Bot):
 
 
 bot = Bot()
+#bot = MobileBot()
 bot.full_action()
-# print(bot.order)
-
-# print(bot.result_to_click)
-####Arange to take non scheduled first, take 1 result
-####If there is no None Scheduled, then proceed with scheduled if its time came
-
-
-#Worktime sa me nejt ne website merret prej orderit, jo ne google search
-#Ne search mun me bo 1 pun randome
-#Ne baz te aksionit kena me zgjedh me kliku njanen prej sponsorave, 
-#Nese jan ma shum se 1 me u kliku 1 sponsor random ose lokacion random
-#Nese veq 1 kliko qato sponsor

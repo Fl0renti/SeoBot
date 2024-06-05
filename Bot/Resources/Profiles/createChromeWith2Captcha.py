@@ -1,6 +1,6 @@
 from selenium import webdriver
 import time
-from Bot.configs.config import captcha_profile_dir
+from configs.config import captcha_profile_dir
 # Path to the existing Chrome profile directory
 # /Users/dev1/Desktop/Python Examples
 chrome_profile_directory = captcha_profile_dir

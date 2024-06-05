@@ -34,3 +34,6 @@ libs/
 *.tmp
 *.swp
 *~
+
+# Profiles
+Bot/Resources/Profiles/

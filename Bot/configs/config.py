@@ -14,3 +14,4 @@ USERS_AGENTS_Web_JSON = f"{get_root_folder()}/Resources/userAgents/web.json"
 NUMBER_OF_THREADS = 10
 LOGS = f"{get_root_folder()}/Resources/Logs/"
 DjangoURL = "127.0.0.1:8000" #192.168.10.4:8000
+captcha_profile_dir = 'C:/Users/SEOBOT01/Documents/GitHub/SeoBot/Bot/Resources/Profiles/profile_with_2captcha'

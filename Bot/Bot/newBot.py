@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-
+from Bot.configs.config import captcha_profile_dir
 
 import time
 import pyautogui
@@ -140,7 +140,7 @@ class Bot:
         """
         Copies main profile directory with 2captcha installed on it into a new profile directory
         """
-        main_profile_dir = 'D:/upbizz projects/SEOBotWeb/Resources/Profiles/profile_with_2captcha'
+        main_profile_dir = captcha_profile_dir
         if not os.path.exists(self.__profile_dir):
             shutil.copytree(main_profile_dir, self.__profile_dir)
             print(f'{self.__profile_dir} created')

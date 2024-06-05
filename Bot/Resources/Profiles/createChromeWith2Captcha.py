@@ -1,9 +1,9 @@
 from selenium import webdriver
 import time
-
+from Bot.configs.config import captcha_profile_dir
 # Path to the existing Chrome profile directory
 # /Users/dev1/Desktop/Python Examples
-chrome_profile_directory = 'D:/upbizz projects/SEOBotWeb/Resources/Profiles/profile_with_2captcha'
+chrome_profile_directory = captcha_profile_dir
 
 try:
     # Configure Chrome options to use the specified profile

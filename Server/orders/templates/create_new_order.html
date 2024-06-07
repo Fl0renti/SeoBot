@@ -46,8 +46,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.active.id_for_label }}" class="form-label">{{ form.active.label }}:</label>
-                            {{ form.active }}
+                            <label for="{{ form.active.id_for_label }}" class="form-label">{{ form.click_domain_only.label }}:</label>
+                            {{ form.click_domain_only }} 
                         </div>
 
                         <div class="row">
@@ -102,4 +102,31 @@
             </div>
         </div>
     </div>
+    <style>
+        .domain-message {
+            font-weight: bold;
+            color: #752610; /* You can change the color as needed */
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var clickDomainCheckbox = document.getElementById('{{ form.click_domain_only.id_for_label }}');
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'domain-message';
+            messageDiv.style.display = 'none'; // Hide the message by default
+            messageDiv.innerHTML = 'Please use "www." and ".com" or your TLD in Domain name.'; // Set the message content
+    
+            clickDomainCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    messageDiv.style.display = 'block'; // Show the message when checkbox is checked
+                } else {
+                    messageDiv.style.display = 'none'; // Hide the message when checkbox is unchecked
+                }
+            });
+    
+            // Append the message element to the form
+            var formGroup = clickDomainCheckbox.closest('.mb-3');
+            formGroup.appendChild(messageDiv);
+        });
+    </script>
 {% endblock content %}

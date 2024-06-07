@@ -1,6 +1,9 @@
 import json
 import os
 import logging
+from pathlib import Path
+
+config_dir = Path(__file__).parent
 def get_root_folder():
     return os.getcwd()
 
@@ -13,5 +16,5 @@ USERS_AGENTS_Tablet_JSON = f"{get_root_folder()}/Resources/userAgents/tablet.jso
 USERS_AGENTS_Web_JSON = f"{get_root_folder()}/Resources/userAgents/web.json"
 NUMBER_OF_THREADS = 10
 LOGS = f"{get_root_folder()}/Resources/Logs/"
-DjangoURL = "127.0.0.1:8000"
-captcha_profile_dir = "D:/upbizz projects/SEOBotWeb/Resources/Profiles/profile_with_2captcha"
+DjangoURL = "127.0.0.1:8000" #192.168.10.4:8000
+captcha_folder_dir = config_dir.parent / 'resources' / 'profiles' / 'profile_with_2captcha'

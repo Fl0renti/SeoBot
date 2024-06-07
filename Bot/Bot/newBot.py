@@ -19,7 +19,7 @@ import os
 from urllib.parse import urlparse
 import requests
 import shutil
-
+import threading
 
 # from solveRecaptcha.solveRecaptcha import solveRecaptcha
 # from telnetlib import EC
@@ -45,7 +45,7 @@ class Bot:
         
         self.chrome_options = None 
         self.location = None
-        self.__profile_dir = None
+        self.profile_dir = None
         self.profile_in_use = False
 
         self.mobile_emulation = {
@@ -56,10 +56,6 @@ class Bot:
         self.domain = ""
         self.profile = {}
         self.order = {}
-
-        self.__sponsored_results_xpath = "//span[text()='Sponsored']//ancestor::div[contains(@class, 'xpd')]"
-        self.__business_results_xpath = ""
-        self.__sponsored_business_results_xpath = ""
 
         self.result_to_click = None
         self.sponsored_results = []
@@ -106,6 +102,7 @@ class Bot:
             return False
 
     def solve_captcha(self):
+
         if self.__is_recaptcha_present():
             print("Solving Captcha")
             WebDriverWait(self.driver, 10).until(
@@ -121,18 +118,26 @@ class Bot:
                     self.close_web_driver()
                 pass
             
+    def set_proxy(self):
 
-    def __authenticate_proxy(self):
+        """
+        Fixes proxy for authentication
+        :return:
+        """
+        self.__proxy = f"http://{self.profile['proxyusername']}:{self.profile['proxypassword']}@{self.profile['proxy']}"
+        self.profile['proxy'] = self.__proxy
+        print("Proxy set!")
+
+    def authenticate_proxy(self):
 
         """
         passes the authentication of proxy when starting webbrowser
         :return:
         """
         self.driver.get("https://www.google.com")
-        time.sleep(2)
-        pyautogui.typewrite(self.profile['proxyusername'])
+        pyautogui.write(self.profile['proxyusername'])
         pyautogui.press('tab')
-        pyautogui.typewrite(self.profile['proxypassword'])
+        pyautogui.write(self.profile['proxypassword'])
         pyautogui.press('enter')
         self.driver.get("https://www.google.com")
 
@@ -140,23 +145,26 @@ class Bot:
         """
         Copies main profile directory with 2captcha installed on it into a new profile directory
         """
-        main_profile_dir = captcha_profile_dir
-        if not os.path.exists(self.__profile_dir):
-            shutil.copytree(main_profile_dir, self.__profile_dir)
-            print(f'{self.__profile_dir} created')
+        from pathlib import Path
+        parent_dir = Path(__file__).parent
+        main_profile_dir = parent_dir.parent / 'resources' / 'profiles' / 'profile_with_2captcha'
+
+        if not os.path.exists(self.profile_dir):
+            shutil.copytree(main_profile_dir, self.profile_dir)
+            print(f'{self.profile_dir} created')
         
 
 
-    def __set_or_create_profile_directory(self):
+    def set_or_create_profile_directory(self):
         """
         Creates profile directory if this profile directory does not exist, else does not create directory
         if it catches OS Error, logs the reason why didnt it do its job.
         """
-        self.__profile_dir = os.path.join(os.getcwd(), f'Resources/Profiles/profile{self.profile["id"]}')
+        self.profile_dir = os.path.join(os.getcwd(), f'Resources/Profiles/profile{self.profile["id"]}')
         try:
             self.__create_new_profile_dir_from_existing_profile()
         except OSError as e:
-            print(f"Could not create directory {self.__profile_dir}: {e}")
+            print(f"Could not create directory {self.profile_dir}: {e}")
             return 
 
     def set_location(self):
@@ -174,8 +182,10 @@ class Bot:
         Configures chrome options
         """
         self.chrome_options = Options()
-        self.chrome_options.add_argument(f"user-data-dir={self.__profile_dir}")
-        self.chrome_options.add_argument(f"--proxy-server={self.profile['proxy']}")
+        self.set_proxy()
+        self.chrome_options.add_argument(f"user-data-dir={self.profile_dir}")
+        self.chrome_options.add_argument(f"--proxy={self.profile['proxy']}")
+        # self.chrome_options.add_argument(f"--proxy={self.proxy}")
         self.chrome_options.add_argument("--verbose")
         self.chrome_options.add_argument(f"user-agent={self.profile['UserAgent']}")
 
@@ -186,9 +196,10 @@ class Bot:
         self.chrome_options.add_experimental_option("prefs", chrome_prefs)
 
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.chrome_options)
+        
 
         self.set_location()
-        # self.driver.maximize_window()
+        self.driver.set_window_size(800, 800)
 
 
     def close_web_driver(self):
@@ -198,19 +209,27 @@ class Bot:
             self.set_profile_free(self.profile['id'])
         if self.profile_in_use:
             self.set_profile_free(self.profile['id'])
-        print("Proceeding to next order...")
+        print("Trying to get new order...")
         time.sleep(3)
 
 
+    def random_scroll(self):
+        """
+        Makes random scroll, used more in mobile version
+        """
+        random_number = random.randint(-500, 1000)
+        self.driver.execute_script(f"window.scrollBy({{top: {random_number}, behavior: 'smooth'}});")
 
-    def make_random_movements(self, driver, start_time, work_time):
+    def make_random_movements(self):
         """
         Makes random movements of mouse to look like human
         """
+        start_time = time.time()
+        work_time = self.order['work_sec']
         if time.time() - start_time > work_time:
             print("Reached the specified work time. Stopping.")
         else:
-            window_rect = driver.get_window_rect()
+            window_rect = self.driver.get_window_rect()
             width, height = window_rect['width'], window_rect['height']
             start_x = window_rect['x'] + width // 2
             start_y = window_rect['y'] + height // 2
@@ -236,7 +255,7 @@ class Bot:
                     mouse_x, mouse_y = pyautogui.position()
 
                     # Find clickable elements (like <a> tags with href attributes)
-                    clickable_elements = driver.find_elements(By.CSS_SELECTOR, "a[href]")
+                    clickable_elements = self.driver.find_elements(By.CSS_SELECTOR, "a[href]")
 
                     for element in clickable_elements:
                         # Get the element's location and size
@@ -262,7 +281,7 @@ class Bot:
                 move_y = start_y + random.randint(-150, 150)
                 pyautogui.moveTo(move_x, move_y, duration=0.2)
                 # Check if the end of the page is reached
-                if driver.execute_script("return window.innerHeight + window.scrollY >= document.body.offsetHeight"):
+                if self.driver.execute_script("return window.innerHeight + window.scrollY >= document.body.offsetHeight"):
                     break
             clicked = False
             # Scroll back up to the top of the page
@@ -281,7 +300,7 @@ class Bot:
                     mouse_x, mouse_y = pyautogui.position()
 
                     # Find clickable elements (like <a> tags with href attributes)
-                    clickable_elements = driver.find_elements(By.CSS_SELECTOR, "a[href]")
+                    clickable_elements = self.driver.find_elements(By.CSS_SELECTOR, "a[href]")
 
                     for element in clickable_elements:
                         # Get the element's location and size
@@ -306,7 +325,7 @@ class Bot:
                 move_y = start_y + random.randint(-150, 150)
                 pyautogui.moveTo(move_x, move_y, duration=0.2)
                 # Check if the top of the page is reached
-                if driver.execute_script("return window.scrollY == 0"):
+                if self.driver.execute_script("return window.scrollY == 0"):
                     break
 
             print("Completed human-like scrolling.")
@@ -330,25 +349,37 @@ class Bot:
         try:
             self.set_chrome_options()
             print("Chrome options set")
-            self.__authenticate_proxy()
-            print("Proxy Authenticated")
+            self.driver.get("https://www.google.com")
+            # self.authenticate_proxy()
+            # print("Proxy Authenticated")
         except Exception as e:
             print("Error setting up web driver. \t", e)
             self.close_web_driver()
 
     def type_in_input(self, words):
+        try:
+            search_input = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.NAME, "q"))
+            )
+            for character in words:
+                search_input.send_keys(character)
+                time.sleep(random.uniform(0.1, 0.5))
 
-        search_input = WebDriverWait(self.driver, 10).until(
-        EC.element_to_be_clickable((By.NAME, "q"))
-        )
+            search_input.send_keys(Keys.RETURN)
+            print("Searched for: ", self.domain)
+            time.sleep(2)
+        except:
+            self.driver.get("https://www.google.com")
+            search_input = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.NAME, "q"))
+            )
+            for character in words:
+                search_input.send_keys(character)
+                time.sleep(random.uniform(0.1, 0.5))
 
-        for character in words:
-            search_input.send_keys(character)
-            time.sleep(random.uniform(0.1, 0.5))
-
-        search_input.send_keys(Keys.RETURN)
-        print("Searched for: ", self.domain)
-        time.sleep(2)
+            search_input.send_keys(Keys.RETURN)
+            print("Searched for: ", self.domain)
+            time.sleep(2)
 
 
     def __check_results(self, xpath):
@@ -450,43 +481,49 @@ class Bot:
         """
         return True if data in used_profiles else False
     
-    def set_profile(self):
-        """
-        Sets profile data, fetches new profile if fetched profile is not free
-        """
-        profile = self.get_random_profile()
-        
-        #while there is no free profile
-        while profile is None:
-            print("All profiles are busy, checking again")
-            time.sleep(3)
-            profile = self.get_random_profile()
-
-        if self.__is_profile_in_use(profile):
-            print("\nProfile bussy with another order!\n")
-            while self.__is_profile_in_use(profile):
-                print("Profile is already in use, fetching a new profile...")
-                profile = self.get_random_profile()
-            print("\nFree profile fetched!\n")
-        self.profile = profile
-        used_profiles.append(self.profile)
-        self.__set_or_create_profile_directory() # creates a profile_dir if it doesnt exist, or just gets the existing profile dir
-        print("---------Profile-------------------")
-        print(f"Profile id: {self.profile['id']}\nProxy ip: {self.profile['proxy']}")
-        print(f"Country: {self.profile['country']}\nRegion: {self.profile['regionName']}\nTimezone: {self.profile['timezone']}")
-        print("-----------------------------------")
-        
-    def get_random_profile(self):
+    def request_random_profile(self):
         """
         Gets a random profile from django server
         """
-        profile_url = "http://" + self.django_url + "/api/get/random/user/web/2"
+        profile_url = "http://" + self.django_url + "/api/get/random/user/web/1"
         response = requests.get(profile_url)
         data = response.json()
         if 'error' in data:
             return None
         self.profile_in_use = True
         return data
+    
+    def get_profile(self):
+        """
+        Selects a random profile, checks if its used or None and gets another one
+        """        
+
+        profile = self.request_random_profile()
+        #while there is no free profile
+        while profile is None:
+            print("All profiles are busy, checking again")
+            time.sleep(2)
+            profile = self.request_random_profile()
+
+        if self.__is_profile_in_use(profile):
+            print("\nProfile bussy with another order!\n")
+            while self.__is_profile_in_use(profile):
+                print("Profile is already in use, fetching a new profile...")
+                profile = self.request_random_profile()
+            print("\nFree profile fetched!\n")
+        return profile
+    
+    def set_profile(self):
+        """
+        Sets profile data, fetches new profile if fetched profile is not free
+        """
+        self.profile = self.get_profile()
+        used_profiles.append(self.profile)
+        self.set_or_create_profile_directory() # creates a profile_dir if it doesnt exist, or just gets the existing profile dir
+        print("---------Profile-------------------")
+        print(f"Profile id: {self.profile['id']}\nProxy ip: {self.profile['proxy']}")
+        print(f"Country: {self.profile['country']}\nRegion: {self.profile['regionName']}\nTimezone: {self.profile['timezone']}")
+        print("-----------------------------------")
     
     def fetch_orders_from_web(self):
         """
@@ -495,10 +532,9 @@ class Bot:
         time.sleep(1)
         url = f"http://{self.django_url}/api/get/orders/web"
         response = requests.get(url)
-
         if response.status_code == 200:
             orders_data = response.json()[0]
-
+            
             if not orders_data:
                 print("There is no order")
       
@@ -671,26 +707,37 @@ class Bot:
             if self.profile in used_profiles:
                 used_profiles.remove(self.profile)
             url = "http://" + self.django_url + f'/api/set/profile/free/{pk}/'
-            response = requests.post(url)
-            print("Updated profile inUsed: ", response.json())
+            try:
+                response = requests.post(url)
+                print("Updated profile inUsed: ", response.json())
+            except Exception as e:
+                print("\nServer is down. \nError: ", e)
 
     
+    def is_click_domain_only(self):
+        return self.order['click_domain_only']
+
+
     def search_google(self):
         self.start_web_driver()
         print("\n\n Started web driver\n")
         self.parsed_url = urlparse(self.order['domain_name'])
         self.domain = self.parsed_url.netloc or self.parsed_url.path
-
         self.type_in_input(self.domain) #Types in input the word, in this case the domain
         self.solve_captcha() #Solves captcha if it was found
-        # self.__location_improver_popped_up()
-        self.collect_results_by_action(self.order['action'], pick_random_result=True)
-        self.__do_second_action()
-        start_time = time.time()
-        work_time = self.order['work_sec']
-        self.make_random_movements(self.driver, start_time, work_time)
-        time.sleep(5)
-        print("Finished order!")
+
+        if self.is_click_domain_only():
+            self.make_random_movements()
+            time.sleep(2)
+            self.driver.get(self.order['domain_name'])
+            self.make_random_movements()
+        else:
+            # self.__location_improver_popped_up()
+            self.collect_results_by_action(self.order['action'], pick_random_result=True)
+            self.__do_second_action()
+            self.make_random_movements()
+            time.sleep(5)
+            print("Finished order!")
 
     def full_action(self):
         while True:
@@ -711,6 +758,8 @@ class MobileBot(Bot):
 
     def __init__(self):
         super().__init__()
+
+        self.proxy = None
         self.xpaths = {
             'Sponsored' : "//span[text()='Sponsored']//ancestor::div[contains(@class, 'xpd')]",
             'Location': {
@@ -765,15 +814,30 @@ class MobileBot(Bot):
         user_agent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/125.0.6422.145 Mobile/15E148 Safari/604.1"
         options = Options()
         options.add_argument(f'--user-agent={user_agent}')
-        driver = webdriver.Chrome(options=options)
-        driver.get('https://www.dyson.com/en')
-        start_time = time.time()
-        self.fetch_orders_from_web()
-        work_time = self.order['work_sec']
-        print("WORK TIME: ", work_time)
-        self.make_random_movements(driver, start_time, work_time)
-        time.sleep(100)
-        driver.quit()
+        self.driver = webdriver.Chrome(options=options)
+        self.driver.get('https://www.google.com/')
+        self.open_tabs()
+      
+        time.sleep(200)
+        self.driver.quit()
+
+    def test(self):
+        thread1 = threading.Thread(target=self.full_action)
+        thread2 = threading.Thread(target=self.full_action)
+
+        thread1.start()
+        thread2.start()
+
+        # Wait for both threads to complete
+        thread1.join()
+        thread2.join()
+
+    def open_tabs(self, num_of_tabs=3):
+        for i, tab in enumerate(range(num_of_tabs)):
+            self.driver.execute_script("window.open('https://www.google.com');")
+            new_window_handle = self.driver.window_handles[-1]
+            self.driver.switch_to.window(new_window_handle)
+            self.type_in_input(f"Searching for tab {i}")
 
     def collect_item_from_list_of_elements(self, list_of_elements, item):
         """
@@ -804,11 +868,11 @@ class MobileBot(Bot):
         print(f"Could not find {items[item]} Button")
         return None
 
-    def get_random_profile(self):
+    def request_random_profile(self):
         """
-        Gets a random profile from django server
+        Requests a random profile from django server
         """
-        profile_url = "http://" + self.django_url + "/api/get/random/user/mobile/2"
+        profile_url = "http://" + self.django_url + "/api/get/random/user/mobile/1"
         response = requests.get(profile_url)
         data = response.json()
         if 'error' in data:
@@ -816,20 +880,72 @@ class MobileBot(Bot):
         self.profile_in_use = True
         return data
     
+    def make_random_movements(self):
+        print("Making Random Movements")
+        start_time = time.time()
+        work_time = self.order['work_sec']
+        wait_time = random.randint(2, 5)
+        if time.time() - start_time > work_time:
+            print("Reached the specified work time. Stopping.")
+        else:
+            while True:
+                if time.time() - start_time > work_time:
+                    print("Reached the specified work time. Stopping.")
+                    break
+                self.random_scroll()
+                time.sleep(wait_time)
+
+    def set_chrome_options(self):
+        """
+        Configures chrome options
+        """
+        self.chrome_options = Options()
+        self.set_proxy()
+        self.chrome_options.add_argument(f"user-data-dir={self.profile_dir}")
+        self.chrome_options.add_argument(f"user-agent={self.profile['UserAgent']}")
+        self.chrome_options.add_argument(f"--proxy={self.profile['proxy']}")
+        self.chrome_options.add_argument("--verbose")
+        # self.chrome_options.add_argument("--headless")  # Run in headless mode
+
+        chrome_prefs = {
+            "profile.default_content_setting_values.geolocation": 1,  # Allow geolocation
+            "intl.accept_languages": "en,en_US",  # Language preferences
+            "timezone": self.profile["timezone"]
+        }
+        self.chrome_options.add_experimental_option("prefs", chrome_prefs)
+        # self.chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Mitigate detection
+        # self.chrome_options.add_argument("--disable-infobars")  # Disable infobars
+        # self.chrome_options.add_argument("--disable-notifications")  # Disable notifications
+        # self.chrome_options.add_argument("--disable-gpu")  # Disable GPU for testing purposes
+        # self.chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
+        # self.chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+
+        # Initialize the driver with the configured options
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.chrome_options)
+
+
+    
 
 
 
+def multiple_mobile_threads(num_of_threads=6):
+    threads = []
+    bots = []
+    #starting bots
+    for bot in range(num_of_threads):
+        bot_instance = MobileBot()
+        bots.append(bot_instance)
+    #Starting threads
+    for i, bot in enumerate(bots):
+        thread = threading.Thread(target=bot.full_action)
+        thread.start()
+        threads.append(thread)
+        time.sleep(6)
+
+    for thread in threads:
+        thread.join()
+
+
+# multiple_mobile_threads()
 bot = Bot()
 bot.full_action()
-# print(bot.order)
-
-# print(bot.result_to_click)
-####Arange to take non scheduled first, take 1 result
-####If there is no None Scheduled, then proceed with scheduled if its time came
-
-
-#Worktime sa me nejt ne website merret prej orderit, jo ne google search
-#Ne search mun me bo 1 pun randome
-#Ne baz te aksionit kena me zgjedh me kliku njanen prej sponsorave, 
-#Nese jan ma shum se 1 me u kliku 1 sponsor random ose lokacion random
-#Nese veq 1 kliko qato sponsor

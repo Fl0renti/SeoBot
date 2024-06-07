@@ -6,9 +6,12 @@ class OrdersConfig(AppConfig):
     name = "orders"
 
     def ready(self):
-        from .tasks import set_all_profiles_unused
-        import orders.signals
-        set_all_profiles_unused()
+        try:
+            from .tasks import set_all_profiles_unused
+            import orders.signals
+            set_all_profiles_unused()
+        except:
+            pass
 
 
 

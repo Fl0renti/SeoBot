@@ -20,6 +20,7 @@ class Order(models.Model):
     ]
     domain_name = models.CharField(max_length=100)
     active = models.BooleanField(default=False, verbose_name='Active')
+    click_domain_only = models.BooleanField(default=False, verbose_name='Click domain only')
     work_sec = models.PositiveIntegerField(verbose_name="Work Seconds", default=30, help_text="Minimum 30 seconds")
     avg_sec = models.PositiveIntegerField(verbose_name="Average Seconds", default=30, help_text="Minimum 30 seconds")
     num_users = models.PositiveIntegerField(verbose_name="Number of Users")

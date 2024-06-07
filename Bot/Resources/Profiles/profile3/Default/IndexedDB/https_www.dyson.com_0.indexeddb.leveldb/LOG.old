@@ -1,6 +1,0 @@
-2024/06/03-17:15:23.143 5764 Creating DB D:\upbizz projects\FINAL TEST\Bot\Resources\Profiles\profile3\Default\IndexedDB\https_www.dyson.com_0.indexeddb.leveldb since it was missing.
-2024/06/03-17:15:23.146 5764 Reusing MANIFEST D:\upbizz projects\FINAL TEST\Bot\Resources\Profiles\profile3\Default\IndexedDB\https_www.dyson.com_0.indexeddb.leveldb/MANIFEST-000001
-2024/06/03-17:15:24.351 5764 Level-0 table #5: started
-2024/06/03-17:15:24.353 5764 Level-0 table #5: 2429 bytes OK
-2024/06/03-17:15:24.354 5764 Delete type=0 #3
-2024/06/03-17:15:24.354 5764 Manual compaction at level-0 from '\x00\x02\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x03\x00\x00\x00' @ 0 : 0; will stop at (end)

@@ -928,6 +928,9 @@ class MobileBot(Bot):
 
 
 def multiple_mobile_threads(num_of_threads=6):
+    """
+    Creates a bot for each thread to work independently from each other 
+    """
     threads = []
     bots = []
     #starting bots
@@ -945,6 +948,10 @@ def multiple_mobile_threads(num_of_threads=6):
         thread.join()
 
 
-# multiple_mobile_threads()
-bot = Bot()
-bot.full_action()
+
+#If u are using mobile version uncomment multiple_mobile_threads() function
+multiple_mobile_threads(num_of_threads=7)
+
+#If you are using web version uncomment those two lines of code.
+# bot = Bot()
+# bot.full_action()

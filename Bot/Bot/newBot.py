@@ -211,6 +211,22 @@ class Bot:
         print("Trying to get new order...")
         time.sleep(3)
 
+    def get_all_hrefs(self):
+        """
+        Gets all hrefs from current web
+        """
+        elements = self.driver.find_elements(By.TAG_NAME, 'a')
+        hrefs = [element.get_attribute("href") for element in elements]
+        return hrefs
+    
+    def get_random_href(self):
+        """
+        Gets all hrefs and then picks one random href to click it
+        """
+        hrefs = self.get_all_hrefs()
+        random_href = self.pick_random_result(hrefs)
+        return random_href
+
 
     def random_scroll(self):
         """
@@ -219,12 +235,12 @@ class Bot:
         random_number = random.randint(-500, 1000)
         self.driver.execute_script(f"window.scrollBy({{top: {random_number}, behavior: 'smooth'}});")
 
-    def make_random_movements(self):
+
+    def make_random_movements_for_given_time(self, work_time=30):
         """
-        Makes random movements of mouse to look like human
+        Makes random movements for given time
         """
         start_time = time.time()
-        work_time = self.order['work_sec']
         if time.time() - start_time > work_time:
             print("Reached the specified work time. Stopping.")
         else:
@@ -329,6 +345,44 @@ class Bot:
 
             print("Completed human-like scrolling.")
 
+    def make_random_movements(self):
+        """
+        Makes random movements of mouse to look like human
+        """
+        self.make_random_movements_for_given_time(self.order['work_sec'])
+
+
+    def make_random_movements_with_followup_links(self):
+        """
+        Makes random movements with follow up links, stays in a link for 30 seconds, than goes to another link for another 30 seconds until work_time reached
+        """
+        print("\nMaking random movements with follow up links\n")
+        start_time = time.time() #Time when we started movements
+        work_time = self.order['work_sec']
+
+        self.make_random_movements_for_given_time(random.randint(25, 30))
+        href_to_follow_up = self.get_random_href()
+        initial_url = self.driver.current_url
+        if work_time <=30:
+            print("Reached specific time for random movements with follow up links")
+        else:
+            while True:
+                if time.time() - start_time > work_time:
+                    print("Reached specific time for random movements with follow up links")
+                    break
+                try:
+                    self.driver.get(href_to_follow_up)
+                except:
+                    self.driver.get(initial_url)
+                print(f"{int(work_time - (time.time() - start_time))} seconds left for more activity")
+                self.make_random_movements_for_given_time(random.randint(25, 40))
+                try:
+                    self.driver.back()
+                except:
+                    self.driver.get(initial_url)
+                self.make_random_movements_for_given_time(random.randint(6, 15))
+                href_to_follow_up = self.get_random_href()
+                time.sleep(2)
 
     def test_web_driver(self):
         """
@@ -714,6 +768,9 @@ class Bot:
 
     
     def is_click_domain_only(self):
+        """
+        Returns True if we have to go directly to the given domain no matter if it finds that domain in first page or no
+        """
         return self.order['click_domain_only']
 
 
@@ -726,15 +783,18 @@ class Bot:
         self.solve_captcha() #Solves captcha if it was found
 
         if self.is_click_domain_only():
-            self.make_random_movements()
+            """
+            If we have to follow to a given domain no matter if we find that result or no, we scroll, go to that domain and scroll again.
+            """
+            self.make_random_movements_for_given_time(random.randint(15, 30))
             time.sleep(2)
             self.driver.get(self.order['domain_name'])
-            self.make_random_movements()
+            self.make_random_movements_with_followup_links()
         else:
             # self.__location_improver_popped_up()
             self.collect_results_by_action(self.order['action'], pick_random_result=True)
             self.__do_second_action()
-            self.make_random_movements()
+            self.make_random_movements_with_followup_links()
             time.sleep(5)
             print("Finished order!")
 
@@ -814,22 +874,13 @@ class MobileBot(Bot):
         options = Options()
         options.add_argument(f'--user-agent={user_agent}')
         self.driver = webdriver.Chrome(options=options)
-        self.driver.get('https://www.google.com/')
-        self.open_tabs()
-      
+        self.driver.get('https://www.amazon.com/')
+        self.order['work_sec'] = 300   
+        self.make_random_movements()
         time.sleep(200)
         self.driver.quit()
 
-    def test(self):
-        thread1 = threading.Thread(target=self.full_action)
-        thread2 = threading.Thread(target=self.full_action)
 
-        thread1.start()
-        thread2.start()
-
-        # Wait for both threads to complete
-        thread1.join()
-        thread2.join()
 
     def open_tabs(self, num_of_tabs=3):
         for i, tab in enumerate(range(num_of_tabs)):
@@ -879,20 +930,24 @@ class MobileBot(Bot):
         self.profile_in_use = True
         return data
     
-    def make_random_movements(self):
-        print("Making Random Movements")
+    def make_random_movements_for_given_time(self, work_time=30):
+        """
+        Makes random movements such as scrolls in mobile version for a given work time.
+        """
+        print(f"\nMaking Random Movements for {work_time} seconds\n")
         start_time = time.time()
-        work_time = self.order['work_sec']
-        wait_time = random.randint(2, 5)
+        
+        wait_time = random.randint(2, 4)
+
         if time.time() - start_time > work_time:
             print("Reached the specified work time. Stopping.")
         else:
             while True:
                 if time.time() - start_time > work_time:
-                    print("Reached the specified work time. Stopping.")
                     break
                 self.random_scroll()
                 time.sleep(wait_time)
+
 
     def set_chrome_options(self):
         """
@@ -949,9 +1004,13 @@ def multiple_mobile_threads(num_of_threads=6):
 
 
 
-#If u are using mobile version uncomment multiple_mobile_threads() function
+# If u are using mobile version uncomment multiple_mobile_threads() function
+
 multiple_mobile_threads(num_of_threads=7)
 
+
+
 #If you are using web version uncomment those two lines of code.
+
 # bot = Bot()
 # bot.full_action()

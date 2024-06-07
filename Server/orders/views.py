@@ -267,6 +267,8 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         order = self.get_object()
         domain_name = order.domain_name
+        if form.cleaned_data.get('click_domain_only'):
+            form.instance.active = True
         response = super().form_valid(form)
         messages.success(self.request, f"Domain for&nbsp;<strong>{domain_name}</strong>&nbsp;has been updated succesfully!")
         return response

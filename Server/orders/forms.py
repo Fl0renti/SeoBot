@@ -14,11 +14,12 @@ class CreateNewOrder(forms.ModelForm):
 
     class Meta:
         model = Order
-        fields = ('domain_name', 'domain_type', 'click_domain_only', 'work_sec', 'avg_sec', 'num_users', 'order_schedule')
+        fields = ('domain_name', 'domain_type', 'click_domain_only', 'active', 'work_sec', 'avg_sec', 'num_users', 'order_schedule')
         widgets = {
             'domain_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Domain Name'}),
             'domain_type': forms.Select(attrs={'class': 'form-control'}),
             'click_domain_only': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'work_sec': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Work Duration (seconds)', 'min': 30}),
             'avg_sec': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Average Seconds per Page', 'min': 30}),
             'num_users': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Number of Users', 'min': 1}),
@@ -37,10 +38,11 @@ class UpdateOrder(forms.ModelForm):
 
     class Meta:
         model = Order
-        fields = ('domain_name',  'domain_type', 'active', 'work_sec', 'avg_sec', 'num_users', 'order_schedule')
+        fields = ('domain_name',  'domain_type', 'active', 'click_domain_only', 'work_sec', 'avg_sec', 'num_users', 'order_schedule')
         widgets = {
             'domain_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Domain Name'}),
             'domain_type': forms.Select(attrs={'class': 'form-control'}),
+            'click_domain_only': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'work_sec': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Work Duration (seconds)', 'min': 30}),
             'avg_sec': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Average Seconds per Page', 'min': 30}),

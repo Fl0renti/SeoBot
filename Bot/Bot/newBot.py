@@ -125,7 +125,7 @@ class Bot:
         """
         self.__proxy = f"http://{self.profile['proxyusername']}:{self.profile['proxypassword']}@{self.profile['proxy']}"
         self.profile['proxy'] = self.__proxy
-        print("Proxy set!")
+        print("Proxy set!", self.__proxy)
 
     def authenticate_proxy(self):
 
@@ -139,7 +139,6 @@ class Bot:
         pyautogui.write(self.profile['proxypassword'])
         pyautogui.press('enter')
         self.driver.get("https://www.google.com")
-
     def __create_new_profile_dir_from_existing_profile(self):
         """
         Copies main profile directory with 2captcha installed on it into a new profile directory
@@ -181,9 +180,8 @@ class Bot:
         Configures chrome options
         """
         self.chrome_options = Options()
-        self.set_proxy()
         self.chrome_options.add_argument(f"user-data-dir={self.profile_dir}")
-        self.chrome_options.add_argument(f"--proxy={self.profile['proxy']}")
+        self.chrome_options.add_argument(f"proxy-server={self.profile['proxy']}")
         # self.chrome_options.add_argument(f"--proxy={self.proxy}")
         self.chrome_options.add_argument("--verbose")
         self.chrome_options.add_argument(f"user-agent={self.profile['UserAgent']}")
@@ -402,9 +400,9 @@ class Bot:
         try:
             self.set_chrome_options()
             print("Chrome options set")
-            self.driver.get("https://www.google.com")
-            # self.authenticate_proxy()
-            # print("Proxy Authenticated")
+            # self.driver.get("https://www.google.com")
+            self.authenticate_proxy()
+            print("Proxy Authenticated")
         except Exception as e:
             print("Error setting up web driver. \t", e)
             self.close_web_driver()
@@ -954,10 +952,10 @@ class MobileBot(Bot):
         Configures chrome options
         """
         self.chrome_options = Options()
-        self.set_proxy()
+        # self.set_proxy()
         self.chrome_options.add_argument(f"user-data-dir={self.profile_dir}")
         self.chrome_options.add_argument(f"user-agent={self.profile['UserAgent']}")
-        self.chrome_options.add_argument(f"--proxy={self.profile['proxy']}")
+        self.chrome_options.add_argument(f"proxy-server={self.profile['proxy']}")
         self.chrome_options.add_argument("--verbose")
         # self.chrome_options.add_argument("--headless")  # Run in headless mode
 
@@ -1006,11 +1004,12 @@ def multiple_mobile_threads(num_of_threads=6):
 
 # If u are using mobile version uncomment multiple_mobile_threads() function
 
-multiple_mobile_threads(num_of_threads=7)
-
+# multiple_mobile_threads(num_of_threads=7)
+# bot = MobileBot()
+# bot.full_action()
 
 
 #If you are using web version uncomment those two lines of code.
 
-# bot = Bot()
-# bot.full_action()
+bot = Bot()
+bot.full_action()

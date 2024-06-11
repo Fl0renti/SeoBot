@@ -19,6 +19,7 @@ from urllib.parse import urlparse
 import requests
 import shutil
 import threading
+import zipfile
 
 # from solveRecaptcha.solveRecaptcha import solveRecaptcha
 # from telnetlib import EC
@@ -84,9 +85,79 @@ class Bot:
                 'parent': "//div[@id='taw']",
                 'elements_template': "(//div[@class='ixr6Zb ylJcKd RX9eSe'])",
                 'buttons': '',
- }
+            }
         }
 
+        self.manifest_json = """
+            {
+                "version": "1.0.0",
+                "manifest_version": 2,
+                "name": "Chrome Proxy",
+                "permissions": [
+                    "proxy",
+                    "tabs",
+                    "unlimitedStorage",
+                    "storage",
+                    "<all_urls>",
+                    "webRequest",
+                    "webRequestBlocking"
+                ],
+                "background": {
+                    "scripts": ["background.js"]
+                },
+                "minimum_chrome_version":"22.0.0"
+            }
+            """
+        self.background_js = None
+        
+    def set_plugin_for_proxy(self):
+        """
+        Sets Background js used in proxy
+        """
+        self.set_proxy()
+        PROXY_HOST = self.profile['proxy'].split('@')[1].split(':')[0]
+        PROXY_PORT = self.profile['proxy'].split('@')[1].split(':')[1]
+        PROXY_USER = self.profile['proxy'].split('@')[0].split('//')[1].split(':')[0]
+        PROXY_PASS = self.profile['proxy'].split('@')[0].split('//')[1].split(':')[1]
+        self.background_js = """
+                            var config = {
+                                        mode: "fixed_servers",
+                                        rules: {
+                                        singleProxy: {
+                                            scheme: "http",
+                                            host: "%s",
+                                            port: parseInt(%s)
+                                        },
+                                        bypassList: ["localhost"]
+                                        }
+                                    };
+
+                                chrome.proxy.settings.set({value: config, scope: "regular"}, function() {});
+
+                                function callbackFn(details) {
+                                    return {
+                                        authCredentials: {
+                                            username: "%s",
+                                            password: "%s"
+                                        }
+                                    };
+                                }
+
+                                chrome.webRequest.onAuthRequired.addListener(
+                                            callbackFn,
+                                            {urls: ["<all_urls>"]},
+                                            ['blocking']
+                                );
+                                """ % (PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS)
+        
+        pluginfile = 'proxy_auth_plugin.zip'
+        with zipfile.ZipFile(pluginfile, 'w') as zp:
+            zp.writestr("manifest.json", self.manifest_json)
+            zp.writestr("background.js", self.background_js)
+        return pluginfile
+
+    
+    
     def __is_recaptcha_present(self):
         """
         Checks if there is a recaptcha
@@ -125,7 +196,6 @@ class Bot:
         """
         self.__proxy = f"http://{self.profile['proxyusername']}:{self.profile['proxypassword']}@{self.profile['proxy']}"
         self.profile['proxy'] = self.__proxy
-        print("Proxy set!", self.__proxy)
 
     def authenticate_proxy(self):
 
@@ -181,7 +251,9 @@ class Bot:
         """
         self.chrome_options = Options()
         self.chrome_options.add_argument(f"user-data-dir={self.profile_dir}")
-        self.chrome_options.add_argument(f"proxy-server={self.profile['proxy']}")
+        plugin_file = self.set_plugin_for_proxy()
+        self.chrome_options.add_extension(plugin_file)
+        # self.chrome_options.add_argument(f"proxy-server={self.profile['proxy']}")
         # self.chrome_options.add_argument(f"--proxy={self.proxy}")
         self.chrome_options.add_argument("--verbose")
         self.chrome_options.add_argument(f"user-agent={self.profile['UserAgent']}")
@@ -196,7 +268,7 @@ class Bot:
         
 
         self.set_location()
-        self.driver.set_window_size(800, 800)
+        self.driver.set_window_size(500, 500)
 
 
     def close_web_driver(self):
@@ -392,6 +464,18 @@ class Bot:
         time.sleep(100)
         self.driver.quit()
 
+    def accept_cookies(self):
+        """
+        If Cookies button was found, click it 
+        """
+        try:
+            #Click accept cookies button if found
+            button = self.driver.find_element(By.ID, 'L2AGLb')
+            button.click()
+            time.sleep(2)
+        except:
+            pass
+
     def start_web_driver(self):
         """
         Sets up web driver
@@ -400,9 +484,10 @@ class Bot:
         try:
             self.set_chrome_options()
             print("Chrome options set")
-            # self.driver.get("https://www.google.com")
-            self.authenticate_proxy()
+            # self.authenticate_proxy()
+            self.driver.get("https://www.google.com")
             print("Proxy Authenticated")
+            self.accept_cookies()
         except Exception as e:
             print("Error setting up web driver. \t", e)
             self.close_web_driver()
@@ -947,39 +1032,6 @@ class MobileBot(Bot):
                 time.sleep(wait_time)
 
 
-    def set_chrome_options(self):
-        """
-        Configures chrome options
-        """
-        self.chrome_options = Options()
-        # self.set_proxy()
-        self.chrome_options.add_argument(f"user-data-dir={self.profile_dir}")
-        self.chrome_options.add_argument(f"user-agent={self.profile['UserAgent']}")
-        self.chrome_options.add_argument(f"proxy-server={self.profile['proxy']}")
-        self.chrome_options.add_argument("--verbose")
-        # self.chrome_options.add_argument("--headless")  # Run in headless mode
-
-        chrome_prefs = {
-            "profile.default_content_setting_values.geolocation": 1,  # Allow geolocation
-            "intl.accept_languages": "en,en_US",  # Language preferences
-            "timezone": self.profile["timezone"]
-        }
-        self.chrome_options.add_experimental_option("prefs", chrome_prefs)
-        # self.chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Mitigate detection
-        # self.chrome_options.add_argument("--disable-infobars")  # Disable infobars
-        # self.chrome_options.add_argument("--disable-notifications")  # Disable notifications
-        # self.chrome_options.add_argument("--disable-gpu")  # Disable GPU for testing purposes
-        # self.chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
-        # self.chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-
-        # Initialize the driver with the configured options
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.chrome_options)
-
-
-    
-
-
-
 def multiple_mobile_threads(num_of_threads=6):
     """
     Creates a bot for each thread to work independently from each other 
@@ -987,15 +1039,15 @@ def multiple_mobile_threads(num_of_threads=6):
     threads = []
     bots = []
     #starting bots
-    for bot in range(num_of_threads):
+    for i, bot in enumerate(range(num_of_threads)):
         bot_instance = MobileBot()
         bots.append(bot_instance)
     #Starting threads
     for i, bot in enumerate(bots):
+        time.sleep(3)
         thread = threading.Thread(target=bot.full_action)
         thread.start()
         threads.append(thread)
-        time.sleep(6)
 
     for thread in threads:
         thread.join()
@@ -1005,11 +1057,11 @@ def multiple_mobile_threads(num_of_threads=6):
 # If u are using mobile version uncomment multiple_mobile_threads() function
 
 # multiple_mobile_threads(num_of_threads=7)
-# bot = MobileBot()
-# bot.full_action()
+bot = MobileBot()
+bot.full_action()
 
 
 #If you are using web version uncomment those two lines of code.
 
-bot = Bot()
-bot.full_action()
+# bot = Bot()
+# bot.full_action()

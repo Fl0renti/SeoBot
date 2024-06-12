@@ -167,12 +167,6 @@ class ViewKeyword(LoginRequiredMixin, TemplateView):
         return context
 
 
-
-
-
-
-
-
 class CreateNewOrder(CreateView):
     model = Order
     template_name = "create_new_order.html"

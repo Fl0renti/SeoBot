@@ -5,6 +5,7 @@ from .models import Keyword, Order, Profile
 import random
 from SEOBot.settings import PROXY
 import re
+from django.http import HttpResponseServerError
 
 def is_valid_domain(domain):
     # Regular expression pattern for domain name validation
@@ -93,14 +94,18 @@ def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
     proxy = get_a_random_proxy(instance.domain_type)
 
     url = f"https://www.google.com/search?q={instance.domain_name}&num={num_results}"
+
     response = requests.get(url, headers=headers, proxies={'http': proxy, 'https': proxy})
+
 
     # __save_response_to_html(response.text)
 
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # normal_results = get_results(results, 'normal', 'html')
+    def get_results_from_html(instance):
+        """
+        collects results from given html text
+        """
+        soup = BeautifulSoup(response.text, "lxml")
+         # normal_results = get_results(results, 'normal', 'html')
         sponsored_results = [r.find('a').text.strip() for r in get_results(soup, 'sponsored', 'html', domain_type=instance.domain_type)]
         business_results = [r.text.strip() for r in get_results(soup, 'business', 'html', domain_type=instance.domain_type)]
         sponsored_businesses = [r.text.strip() for r in get_results(soup, 'sponsored_business', 'html', domain_type=instance.domain_type)]
@@ -112,6 +117,19 @@ def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
         has_sponsored = len(sponsored_results) > 0
         has_business = len(business_results) > 0
         has_sponsored_business = len(sponsored_businesses) > 0
+        return has_sponsored, has_business, has_sponsored_business
+
+    if response.status_code == 200:
+        has_sponsored, has_business, has_sponsored_business = get_results_from_html(instance)
+        counter = 0
+        while has_sponsored is False and has_business is False and  has_sponsored_business is False:
+            if counter == 2:
+                break 
+            print("Only normal results found, searching with another proxy")
+            proxy = get_a_random_proxy(instance.domain_type)
+            response = requests.get(url, headers=headers, proxies={'http': proxy, 'https': proxy})
+            has_sponsored, has_business, has_sponsored_business = get_results_from_html(instance)
+            counter += 1
 
         profile = Profile.objects.order_by('?').first()
         if has_sponsored:
@@ -121,7 +139,9 @@ def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
         elif has_sponsored_business:
             print("HAS SPONSORED PLACE: ", has_sponsored_business)
         else:
-            print("ONLY NORMAL RESULTS FOUND")
+            print("Reached maximum tries, This keyword is not able to register")
+            Order.objects.get(id=instance.id).delete()
+            return False
         print("PROFILE: ", profile.domain_type)
         Keyword.objects.create(
             keyword = instance,

@@ -1057,11 +1057,11 @@ def multiple_mobile_threads(num_of_threads=6):
 # If u are using mobile version uncomment multiple_mobile_threads() function
 
 # multiple_mobile_threads(num_of_threads=7)
-bot = MobileBot()
-bot.full_action()
+# bot = MobileBot()
+# bot.full_action()
 
 
 #If you are using web version uncomment those two lines of code.
 
-# bot = Bot()
-# bot.full_action()
+bot = Bot()
+bot.full_action()

@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from .models import Order, Keyword, Profile
 from .utils import search_google_for_keyword
 from django.db import transaction
-
+from django.contrib import messages
 
 
 @receiver(post_save, sender=Order)
@@ -19,7 +19,7 @@ def search_on_order_creation(sender, instance, created, **kwargs):
         if created:
             print("Searching for: ", instance.domain_name, f'-- domain_type: {instance.domain_type}')
             search_google_for_keyword(instance)
-
+            
 
 
 

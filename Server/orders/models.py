@@ -31,6 +31,7 @@ class Order(models.Model):
     action = models.CharField(max_length=100, null=True, blank=True, choices=ACTION_CHOICES)
     second_action = models.CharField(max_length=10, choices=SECOND_ACTION_CHOICES, null=True, blank=True)
     
+    no_business_or_sponsor = models.BooleanField(default=False)
 
     def WorkerRequired(self):
         return int(self.num_users - self.reached_users)

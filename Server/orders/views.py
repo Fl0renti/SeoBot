@@ -107,7 +107,7 @@ class ViewOrders(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        order_list = Order.objects.all().order_by('-id')
+        order_list = Order.objects.all().filter(no_business_or_sponsor=False).order_by('-id')
 
         column = self.request.GET.get('column')
         query = self.request.GET.get('query')
@@ -176,8 +176,17 @@ class CreateNewOrder(CreateView):
         if form.cleaned_data.get('click_domain_only'):
             form.instance.active = True
         domain_name = form.cleaned_data['domain_name']
-        messages.success(self.request, f"Domain for&nbsp;<strong>{domain_name}</strong>&nbsp;added successfully!")
-        return super().form_valid(form)
+        messages.success(self.request, f"Domain for&nbsp;<strong>{domain_name}</strong>&nbsp;added! Proceed to <strong> Orders in progress </strong> to decide the next steps.")
+
+        response = super().form_valid(form)
+        order = Order.objects.get(id=form.instance.id)
+        if order.no_business_or_sponsor:
+            messages.error(self.request, f"Domain &nbsp;<strong>{domain_name}</strong>&nbsp;will be ignored! No business or sponsor found.")
+        # Add an error message based on a condition
+        # if ():  # Replace this with your actual condition
+        #     messages.error(self.request, "An error occurred after creating the order.")
+
+        return response
     
 class CreateNewProfile(CreateView):
     model = Profile

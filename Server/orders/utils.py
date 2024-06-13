@@ -83,6 +83,11 @@ def __save_response_to_html(html_content, file_path='output.html'):
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(html_content)
 
+def get_a_response(url, headers, proxy):
+    try:
+        return requests.get(url, headers=headers, proxies={'http': proxy, 'https': proxy})
+    except:
+        return requests.get(url, headers=headers)
 
 def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
     headers = {
@@ -95,8 +100,7 @@ def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
 
     url = f"https://www.google.com/search?q={instance.domain_name}&num={num_results}"
 
-    response = requests.get(url, headers=headers, proxies={'http': proxy, 'https': proxy})
-
+    response = get_a_response(url, headers, proxy)
 
     # __save_response_to_html(response.text)
 
@@ -127,7 +131,7 @@ def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
                 break 
             print("Only normal results found, searching with another proxy")
             proxy = get_a_random_proxy(instance.domain_type)
-            response = requests.get(url, headers=headers, proxies={'http': proxy, 'https': proxy})
+            response = get_a_response(url, headers, proxy)
             has_sponsored, has_business, has_sponsored_business = get_results_from_html(instance)
             counter += 1
 
@@ -140,7 +144,9 @@ def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
             print("HAS SPONSORED PLACE: ", has_sponsored_business)
         else:
             print("Reached maximum tries, This keyword is not able to register")
-            Order.objects.get(id=instance.id).delete()
+            order = Order.objects.get(id=instance.id)
+            order.no_business_or_sponsor = True
+            order.save()
             return False
         print("PROFILE: ", profile.domain_type)
         Keyword.objects.create(
@@ -151,7 +157,6 @@ def search_google_for_keyword(instance, num_results=50, proxy=PROXY):
             profile = profile,
             status = "Waiting"
         )
-
         return True
 
     return False
